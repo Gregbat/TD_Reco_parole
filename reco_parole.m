@@ -2,11 +2,11 @@ clear
 close all;
 
 rep = 'oui-non/';
-nonFichier = {};
+nomFichier = {};
 
 flist = dir(strcat(rep,'*.wav'));
 
-lpcs = {}; ss = {};
+lpcs = {}; ss = {}; classOuiNon = {};
  
 %Calcul des coefficients LPC sur le signal utile
 
@@ -15,25 +15,53 @@ for i = 1:length(flist)
     
     n = flist(i).name;
 
-    nonFichier{length(nonFichier) + 1} = n;
+    nomFichier{length(nomFichier) + 1} = n;
+    
+    %Si le nom du fichier contient 'non', la classe est 'non' et
+    %pareil avec 'oui' 
+    
+    if (contains(n, 'non'))
+        
+        classOuiNon{length(nomFichier)} = 'non';
+        
+    else if (contains(n, 'oui'))
+            
+            classOuiNon{length(nomFichier)} = 'oui';
+            
+        else classOuiNon{length(nomFichier)} = 'undefined';
+            
+        end
+   
+    end
+            
     
     [s Fe nbits] = wavread(strcat(rep,n));
     
     s = s(:,1);
     
-    sModif = rogner(s);
+    %Troncage du signal pour ne conserver que la partie utile
     
-    ss{length(nonFichier)} = sModif; 
+    sUtile = rogner(s);
     
-    lpc = calcul_lpc(sModif,Fe);
+    %Mise en mémoire du signal tronqué
     
-    lpcs{length(nonFichier)} = lpc;
+    ss{length(nomFichier)} = sUtile;
+    
+    %Calcul des coefficients lpc sur le signal utile
+    
+    lpc = calcul_lpc(sUtile,Fe);
+    
+    %ajout d'une colonne de coefficients lpc dans la matrice lpcs
+    
+    lpcs{length(nomFichier)} = lpc;
+    
+    
     
 end
 
 %Calcul et mise en mémoire de la distance élastique entre chaque fichier 
 
-D = zeros(length(lpcs));
+distanceElast = zeros(length(lpcs));
 
 indexTri = zeros(length(lpcs));
 
@@ -42,13 +70,13 @@ for i = 1: length(lpcs)
     
     for j = 1: length(lpcs)  
     
-        D(i,j) = distance_elastique(lpcs{i},lpcs{j});
+        distanceElast(i,j) = distance_elastique(lpcs{i},lpcs{j});
         
     end
     
     %Tri des distances
     
-    [C I] = sort(D(i,:));
+    [C I] = sort(distanceElast(i,:));
     
     indexTri(i,:) = I;
     
@@ -73,7 +101,7 @@ for l = 1:length(flist)
     
     plot(ss{l});
     
-    title(['S_{utile} de ',nonFichier{l}]);
+    title(['S_{utile} de ',nomFichier{l}]);
     
 end
 
@@ -85,9 +113,9 @@ for k = 1:length(flist)
     
     subplot(5,5,k);
 
-    bar(D(:,k));
+    bar(distanceElast(:,k));
     
-    title(['Distance de ', nonFichier{k}]);
+    title(['Distance de ', nomFichier{k}]);
     
 end
  
