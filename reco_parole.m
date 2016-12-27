@@ -6,7 +6,9 @@ nomFichier = {};
 
 flist = dir(strcat(rep,'*.wav'));
 
-lpcs = {}; ss = {}; classOuiNon = {};
+lpcs = {}; ss = {}; classOuiNon = {}; classOuiNonEstimee = {};
+
+
  
 %Calcul des coefficients LPC sur le signal utile
 
@@ -65,6 +67,8 @@ distanceElast = zeros(length(lpcs));
 
 indexTri = zeros(length(lpcs));
 
+classPredite = 0; estimCorrecte = 0;
+
 
 for i = 1: length(lpcs)
     
@@ -80,16 +84,46 @@ for i = 1: length(lpcs)
     
     indexTri(i,:) = I;
     
+    % %Classification des signaux
+    
+    for k = 2:6
+        
+        if (classOuiNon{indexTri(i,k)} == 'oui')
+            
+            classPredite = classPredite + 1;
+            
+        else if (classOuiNon{indexTri(i,k)} == 'non')
+                
+                classPredite = classPredite - 1;
+    
+            end
+        end
+    end
+        
+        %Mémorisation de la prédiction
+        
+        if classPredite > 0
+            
+            classOuiNonEstimee{length(classOuiNonEstimee) + 1 } = 'oui';
+            
+        else if classPredite < 0
+                
+            classOuiNonEstimee{length(classOuiNonEstimee) + 1 } = 'non';
+            
+            else classOuiNonEstimee{length(classOuiNonEstimee) + 1 } = 'undefined';
+                
+            end
+        end
+        
+        %Comparaison avec la vérité
+        
+        if classOuiNonEstimee{end} == classOuiNon{i}
+            
+            estimCorrecte = estimCorrecte + 1;
+            
+        end
+            
 end
-
-% 
-% %Classification des signaux
-% 
-% for k = 1:length(flist)
-%    
-%     
-%     
-% end
 
 
 %affichage des signaux utiles (test de robustesse de la fonction rogner)
@@ -116,6 +150,8 @@ for k = 1:length(flist)
     bar(distanceElast(:,k));
     
     title(['Distance de ', nomFichier{k}]);
+    
+    legend(['Predit : ', classOuiNonEstimee{k}]);
     
 end
  
