@@ -30,7 +30,7 @@ for i = 1:length(flist)
             
             classOuiNon{length(nomFichier)} = 'oui';
             
-        else classOuiNon{length(nomFichier)} = 'undefined';
+        else classOuiNon{length(nomFichier)} = 'und';
             
         end
    
@@ -67,9 +67,7 @@ distanceElast = zeros(length(lpcs));
 
 indexTri = zeros(length(lpcs));
 
-classPredite = 0; estimCorrecte = 0;
-
-
+estimCorrecte = 0;
 for i = 1: length(lpcs)
     
     for j = 1: length(lpcs)  
@@ -84,9 +82,10 @@ for i = 1: length(lpcs)
     
     indexTri(i,:) = I;
     
-    % %Classification des signaux
+    %Classification des signaux
+    classPredite = 0; kElements = 5;
     
-    for k = 2:6
+    for k = 2:kElements+1
         
         if (classOuiNon{indexTri(i,k)} == 'oui')
             
@@ -110,7 +109,7 @@ for i = 1: length(lpcs)
                 
             classOuiNonEstimee{length(classOuiNonEstimee) + 1 } = 'non';
             
-            else classOuiNonEstimee{length(classOuiNonEstimee) + 1 } = 'undefined';
+            else classOuiNonEstimee{length(classOuiNonEstimee) + 1 } = 'und';
                 
             end
         end

@@ -1,16 +1,14 @@
 function lpc = calcul_lpc(s, Fe)
 
-Ns = length(s);
+Ns = length(s); 
+N = 30;  %ordre du systeme
+Nechantillon = floor(0.02*Fe);% Taille de la fenêtre
 
-N = 30;%ordre du systeme
+% décalage de la fenêtre -> recouvrement
+offset = floor(Nechantillon/3); 
 
-Nechantillon = floor(0.02*Fe); % Taille de la fenêtre
-
-
-offset = floor(Nechantillon/3); % décalage de la fenêtre
-
-Nfenetre = floor(Ns/offset)-2;  % Nb de fenetres (moins les 2 dernières pour
-                                % éviter les dépassements d'index
+Nfenetre = floor(Ns/offset)-3;  % Nb de fenetres (moins les 2 dernières pour
+                                % éviter les dépassements d'index)
 
 lpc = zeros(N,Nfenetre);
 

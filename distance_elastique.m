@@ -1,6 +1,8 @@
 function D = distance_elastique(u1, u2)
 
 
+%Coefficients pondérateurs
+
 wi = 1;
 
 wd = 1;
@@ -8,13 +10,13 @@ wd = 1;
 ws = 1;
 
 
-[N, L1] = size(u1);
+[N, L1] = size(u1); %L1 fenêtres temporelles, ordre LPC : N
 
-[N, L2] = size(u2);
+[N, L2] = size(u2); 
 
-d = zeros(L1, L2);
+d = zeros(L1, L2); % future matrice produit scalaire de vecteurs
 
-g = zeros(L1, L2);
+g = zeros(L1, L2); %future matrice du chemin parcouru
 
 %calcul de g(1,1)
 

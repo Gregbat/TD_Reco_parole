@@ -1,22 +1,21 @@
 function lpc = calcul_lpc(s, Fe)
 
-Ns = length(s);
+Ns = length(s); 
+N = 30;  %ordre du systeme
+Nechantillon = floor(0.02*Fe);% Taille de la fenêtre
 
-N = 20;%ordre du systeme
+% décalage de la fenêtre -> recouvrement
+offset = floor(Nechantillon/3); 
 
-Nechantillon = floor(0.02*Fe); % Taille de la fenêtre
-
-
-offset = floor(Nechantillon/3); % décalage de la fenêtre
-
-Nfenetre = floor(Ns/offset)-1; % Nb de fenetres
+Nfenetre = floor(Ns/offset)-2;  % Nb de fenetres (moins les 2 dernières pour
+                                % éviter les dépassements d'index)
 
 lpc = zeros(N,Nfenetre);
 
 
-vecteurInv = zeros(N+1,1); % vecteur servant à résoudre l'équation R*A = sigma2*(1; 0 --- 0 
+vecteurInv = zeros(N+1,1); 
 
-vecteurInv(1) = 1;
+vecteurInv(1) = 1; % vecteur servant à résoudre l'équation R*A = sigma2 * (1; 0 ... 0))
 
 for fen = 1: Nfenetre % Pour chaque fenetre
     
@@ -25,7 +24,7 @@ for fen = 1: Nfenetre % Pour chaque fenetre
     
     debEchantillon = (fen - 1) * offset;
     
-    f = hamming(Nechantillon).*s((fen-1) * offset + 1:(fen-1)* offset + Nechantillon);
+    f = hamming(Nechantillon).*s(debEchantillon + 1 : debEchantillon + Nechantillon);
     
 
     %Calcul des fonctions d'autocovariance R(i) = E(s(t)s(t+i))
@@ -85,8 +84,8 @@ for fen = 1: Nfenetre % Pour chaque fenetre
 
 
 
-    lpci = inv(R)*vecteurInv;
-
+    lpci = R\vecteurInv;
+    
     lpci = lpci./(lpci(1));
     
     lpci = lpci(2:end);
