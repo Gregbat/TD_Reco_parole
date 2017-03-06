@@ -14,6 +14,8 @@ function sModif = rogner(s)
 
 CONST.SEUIL = 0.03; % Constante seuil choisie empiriquement 
 CONST.SINUTILE = 10000; % nb d'échantillons à partir d'où faire le balayage
+CONST.LONGSINMIN = 15000;% nb d'échantillons du signal tronqué au min
+
 
 %On calcule le signal Carré du signal moins sa moyenne, récupère le max
 
@@ -53,7 +55,7 @@ end
 while(finNonTrouvee)
 
 
-    if (((sCarre(fin)/maxSCarre) < CONST.SEUIL) ||((fin - debut) > 15000))
+    if (((sCarre(fin)/maxSCarre) < CONST.SEUIL) ||((fin - debut) > CONST.LONGSINMIN))
 
         fin = fin - 1;
 

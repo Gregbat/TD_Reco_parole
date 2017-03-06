@@ -1,13 +1,25 @@
-function lpc = calcul_lpc(s, Fe)
+function lpc = calcul_lpc(s, Fe, N, rec)
 
-Ns = length(s); 
-N = 30;  %ordre du systeme
-Nechantillon = floor(0.02*Fe);% Taille de la fenêtre
+% Cette fonction a pour objectif de calculer et renvoyer les coefficients LPC de chaque
+% fenêtre temporelle d'un signal, choisie à partir de Fe. Ordre LPC : N, recouvrement : rec 
+
+
+% Pour ce faire, On utilise la matrice de covariance, qui, multipliée aux
+% coefficients LPC, nous donne un vecteur nul sauf pour sa première ligne
+% ou il vaut sigma^2. On récupère les coefficients LPC en inversant la
+% matrice R et en la multipliant par (1 0 ... 0)' .
+
+% ---------------------------------------------------------------------  
+
+
+Ns = length(s);
+
+Nechantillon = floor(0.02*Fe);% Taille de la fenêtre 
 
 % décalage de la fenêtre -> recouvrement
-offset = floor(Nechantillon/3); 
+offset = floor(Nechantillon*rec); 
 
-Nfenetre = floor(Ns/offset)-3;  % Nb de fenetres (moins les 2 dernières pour
+Nfenetre = floor(Ns/offset)-floor(1/rec);  % Nb de fenetres (moins les dernières pour
                                 % éviter les dépassements d'index)
 
 lpc = zeros(N,Nfenetre);
