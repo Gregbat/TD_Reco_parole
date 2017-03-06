@@ -1,12 +1,12 @@
 function lpc = calcul_lpc(s, Fe)
 % This function returns LPC coefficients of a signal s sampled with the frequency Fe.
 %
-%LPCs are defined like : s(t(i)) = a1 + a2*t(i-2) + ... + an
+%LPCs are defined like : s(t(i)) = a1*t(i-1) + a2*t(i-2) + ... + an*t(i-n)
 % For each small window of s, we calculate the autocovariance functions R(i) = R(i) = E(s(t)s(t+i))
 %
 % Once we have correlation matrix R, we know that R*A = sigma2 * (1; 0 ... 0)), with A = (1; a1; a2; ... ; an) 
 %
-%Then 
+%Then we find A.
 
 Ns = length(s); 
 N = 30;  %system order
@@ -23,7 +23,7 @@ lpc = zeros(N,Nfenetre);
 
 vecteurInv = zeros(N+1,1); 
 
-vecteurInv(1) = 1; % vector used for the equation R*A = sigma2 * (1; 0 ... 0)) with A con
+vecteurInv(1) = 1; % vector used for the equation R*A = sigma2 * (1; 0 ... 0)) 
 
 for fen = 1: Nfenetre % For each  window
     
