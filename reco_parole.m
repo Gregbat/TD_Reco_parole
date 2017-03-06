@@ -1,3 +1,9 @@
+%% This Program takes in input wave files and tries to predict whether it is a 'oui' or a 'non' which is pronounced
+
+ 
+
+%%Declaration of variables
+
 clear
 close all;
 
@@ -8,13 +14,13 @@ flist = dir(strcat(rep,'*.wav'));
 
 lpcs = {}; ss = {}; classOuiNon = {}; classOuiNonEstimee = {};
 
-CONST.ORDERLPC = 40;
-CONST.RECLPC = 1/3;
-CONST.KELEMENTS = 5;
+CONST.ORDERLPC = 40; %system order
+CONST.RECLPC = 1/3; % Recouvrement
+CONST.KELEMENTS = 5; %Classification : k -elements
 
 nbFichiers = length(flist);
  
-%Calcul des coefficients LPC sur le signal utile
+%Calculation of LPC coefficients of the interesting part of the signal
 
 
 for i = 1:nbFichiers
@@ -23,8 +29,8 @@ for i = 1:nbFichiers
 
     nomFichier{length(nomFichier) + 1} = n;
     
-    %Si le nom du fichier contient 'non', la classe est 'non' et
-    %pareil avec 'oui' 
+    %if the file name is 'oui' ('non'), then class is 'oui' ('non') 
+    % otherwise -> undefined
     
     if (contains(n, 'non'))
         
@@ -45,23 +51,25 @@ for i = 1:nbFichiers
     
     s = s(:,1);
     
-    %Troncage du signal pour ne conserver que la partie utile
+    %Let's crop the signal to get only the useful part
     
     sUtile = rogner(s);
     
-    %Normalisation de la forme d'onde
+ 
+    %Normalization of sUtile
     
     sUtile = sUtile/(max(abs(sUtile)));
-    
-    %Mise en mémoire du signal tronqué
-    
+ 
+    %put this signal in  list
+ 
     ss{length(nomFichier)} = sUtile;
     
-    %Calcul des coefficients lpc sur le signal utile
+    %Calculation of LPC coefficients lpc on cropped signal 
     
     lpc = calcul_lpc(sUtile,Fe,CONST.ORDERLPC,CONST.RECLPC);
-    
-    %ajout d'une matrice de coefficients lpc dans la matrice de matrice lpcs
+ 
+    %add LPC coefficients in lpcs matrix 
+ 
     
     lpcs{length(nomFichier)} = lpc;
     
@@ -69,7 +77,7 @@ for i = 1:nbFichiers
     
 end
 
-%Calcul et mise en mémoire de la distance élastique entre chaque fichier 
+%Calculation and record of 'elastical distance' between each file
 
 distanceElast = zeros(length(lpcs));
 
@@ -84,15 +92,18 @@ for i = 1: nbFichiers
         
     end
     
-    %Tri des distances
+    %sort
     
     [C I] = sort(distanceElast(i,:));
     
     indexTri(i,:) = I;
     
-    %Classification des signaux
+ 
     classPrediteSgn = 0;
-    
+ 
+    %Classification of signals
+    classPredite = 0; kElements = 5;
+ 
     for k = 2:CONST.KELEMENTS+1
         
         if (classOuiNon{indexTri(i,k)} == 'oui')
@@ -107,7 +118,7 @@ for i = 1: nbFichiers
         end
     end
         
-        %Mémorisation de la prédiction
+        %Memorisation of prediction
         
         if classPrediteSgn > 0
             
@@ -122,7 +133,7 @@ for i = 1: nbFichiers
             end
         end
         
-        %Comparaison avec la vérité
+        %Comparison with truth
         
         if classOuiNonEstimee{end} == classOuiNon{i}
             
@@ -132,12 +143,12 @@ for i = 1: nbFichiers
             
 end
 
-%Calcul du nombre de fenêtres à afficher par ligne (5 max) et par colonne
+%Plotting aspects (max. 5 window a line)
 nLi     = floor(nbFichiers/5)+ (mod(nbFichiers,5)>0);
 nCol	= 5;
 
 
-%affichage des signaux utiles (test de robustesse de la fonction rogner)
+% plot cropped signal (test of robustness of 'rogner' function )
 
 fig1 = figure;
 set(fig1,{'Name','Outerposition'},{'Formes d onde des signaux utiles',[100, 450, 1000, 400]});
@@ -154,10 +165,10 @@ end
 
 fig2 = figure;
 
-set(fig2,{'Name','Outerposition'},{'Distances élastiques',[100, 10, 1000, 450]});
+set(fig2,{'Name','Outerposition'},{'Distances ï¿½lastiques',[100, 10, 1000, 450]});
 
 
-%Affichage des distances de chacun des fichiers à chacun des autres 
+% plot distances from files to each other
 
 for k = 1:nbFichiers
     
@@ -165,19 +176,19 @@ for k = 1:nbFichiers
 
     bar(distanceElast(:,k));
     
-    title(['Distance de ', nomFichier{k}]);
+    title(['Distance from ', nomFichier{k}]);
     
-    legend(['Predit : ', classOuiNonEstimee{k}]);
+    legend(['Predicted : ', classOuiNonEstimee{k}]);
     
 end
 
-%affichage du nombre de bonnes prédictions :
-OrdreLPCStr = ['Ordre LPC : ', int2str(CONST.ORDERLPC)];
-nombreCompStr = ['Nombre de comparaisons : ', int2str(CONST.KELEMENTS)];
+%plotting the predictions:
+OrdreLPCStr = ['LPC Order : ', int2str(CONST.ORDERLPC)];
+nombreCompStr = ['Number of comparisons : ', int2str(CONST.KELEMENTS)];
 recStr = ['Recouvrement : ',int2str(CONST.RECLPC*100),' %'];
-nbElementsCorrectsStr = ['Nombre d élements prédits correctement :',int2str(estimCorrecte), '/ ', int2str(nbFichiers)]
+nbElementsCorrectsStr = ['Number of correct predictions :',int2str(estimCorrecte), '/ ', int2str(nbFichiers)]
  
 
-h = msgbox({'Paramètres : ' OrdreLPCStr nombreCompStr recStr nbElementsCorrectsStr})
+h = msgbox({'Parameters : ' OrdreLPCStr nombreCompStr recStr nbElementsCorrectsStr})
 
 

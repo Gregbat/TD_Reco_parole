@@ -1,6 +1,6 @@
 function contient = contains(nom, chaineTestee)
 
-% Fonction renvoyant vrai si chaineTestee est dans nom, faux sinon
+% Function returning true if chaineTestee is in nom, otherwise false
  
 i = 1;
 contient = 0;

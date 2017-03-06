@@ -1,23 +1,24 @@
 function sModif = rogner(s)
 
-% Cette fonction a pour objectif de rogner le signal de manière à ne 
-%conserver que le signal utile
+% This function returns a signal cropped, in order to get only the useful
+% part of the signal. This improves the SNR, so the prediction.
 
 
-% Pour ce faire, on balaye le signal au carré (proportionnel à l'énergie)
-% du début en établissant à chaque nouvel échantillon
+% To get that signal, we take s^2, then we apply a threshold to get a
+% number of sample for the beginning and an other number for the end
+ 
 
 % ---------------------------------------------------------------------  
 
 
-%Définition du rapport limite
+%Definition of threshold
 
-CONST.SEUIL = 0.03; % Constante seuil choisie empiriquement 
-CONST.SINUTILE = 10000; % nb d'échantillons à partir d'où faire le balayage
-CONST.LONGSINMIN = 15000;% nb d'échantillons du signal tronqué au min
+CONST.SEUIL = 0.03; % Const threshold (empiric choice
+CONST.SINUTILE = 10000; % sample from which testing the threshold
+CONST.LONGSINMIN = 15000;% min (number of samples)
 
 
-%On calcule le signal Carré du signal moins sa moyenne, récupère le max
+%Calsulation of max of square of s minus mean(s)
 
 sMoy = s - mean(s);
 
@@ -25,8 +26,7 @@ sCarre = sMoy.*sMoy;
 
 maxSCarre = max(sCarre);
 
-%initialisation des variables d'échantillon du début et de la fin du signal
-%utile (
+%initialisation of variables corresponding to sample index 
 
 debut = CONST.SINUTILE; 
 
@@ -34,12 +34,11 @@ fin = length(s) - CONST.SINUTILE;
 
 debutNonTrouve = 1; finNonTrouvee = 1;
 
-% On crée une boucle simulant le balayage du signal 
+% creating a loop 
 
 while(debutNonTrouve)
     
-    %Tant que le signal au carre ne dépasse pas un certain seuil, on
-    %continue de balayer le signal
+    %while sCarre < threshold, continue
 
     if (sCarre(debut)/maxSCarre) < CONST.SEUIL
 
@@ -67,7 +66,7 @@ while(finNonTrouvee)
 end
 
 
-%Retourner la valeur rognée
+%Return cropped signal
 
 
 sModif = s(debut:fin);
