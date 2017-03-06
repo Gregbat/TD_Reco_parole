@@ -37,8 +37,8 @@ for fen = 1: Nfenetre % For each  window
 
     %Calculation of autocovariance functions R(i) = E(s(t)s(t+i))
     
-    %Smat(i,j) = f(t+i+j) if t+i+j < tmax
-    %We get the unnormalized R(i) by multiplicating 
+    % Smat(i,j) = f(t+i+j) if t+i+j < tmax
+    % We get the unnormalized R(i) by multiplicating 
      
 
     R = [];
@@ -71,7 +71,7 @@ for fen = 1: Nfenetre % For each  window
     Ri = Ri./Nechantillon; % R(i)
     
     
-    %Creation of R matrix
+    % Creation of R matrix
 
     R = zeros(N+1);
 
@@ -88,10 +88,8 @@ for fen = 1: Nfenetre % For each  window
     end
     
     
-    %Calculation of LPC coefficients from R matrix
-    % 
-
-
+    % Calculation of LPC coefficients from R matrix
+ 
 
     lpci = R\vecteurInv;
     
