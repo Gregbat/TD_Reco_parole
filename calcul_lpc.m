@@ -1,37 +1,45 @@
 function lpc = calcul_lpc(s, Fe)
+% This function returns LPC coefficients of a signal s sampled with the frequency Fe.
+%
+%LPCs are defined like : s(t(i)) = a1 + a2*t(i-2) + ... + an
+% For each small window of s, we calculate the autocovariance functions R(i) = R(i) = E(s(t)s(t+i))
+%
+% Once we have correlation matrix R, we know that R*A = sigma2 * (1; 0 ... 0)), with A = (1; a1; a2; ... ; an) 
+%
+%Then 
 
 Ns = length(s); 
-N = 30;  %ordre du systeme
-Nechantillon = floor(0.02*Fe);% Taille de la fenêtre
+N = 30;  %system order
+Nechantillon = floor(0.02*Fe);% window lenght
 
-% décalage de la fenêtre -> recouvrement
+% window offset ('recouvrement')
 offset = floor(Nechantillon/3); 
 
-Nfenetre = floor(Ns/offset)-3;  % Nb de fenetres (moins les 2 dernières pour
-                                % éviter les dépassements d'index)
+Nfenetre = floor(Ns/offset)-3;  % number of windows (minus the three last ones 
+                                % to avoid index overcharging)
 
 lpc = zeros(N,Nfenetre);
 
 
 vecteurInv = zeros(N+1,1); 
 
-vecteurInv(1) = 1; % vecteur servant à résoudre l'équation R*A = sigma2 * (1; 0 ... 0))
+vecteurInv(1) = 1; % vector used for the equation R*A = sigma2 * (1; 0 ... 0)) with A con
 
-for fen = 1: Nfenetre % Pour chaque fenetre
+for fen = 1: Nfenetre % For each  window
     
-    % On définit la portion de s qui nous intéresse et on la multiplie par
-    % une fenêtre de hamming pour éviter les effets de bords :
+    % definition of the portion of s which interests us, then
+    % multiplication with hamming window :
     
     debEchantillon = (fen - 1) * offset;
     
     f = hamming(Nechantillon).*s(debEchantillon + 1 : debEchantillon + Nechantillon);
     
 
-    %Calcul des fonctions d'autocovariance R(i) = E(s(t)s(t+i))
+    %Calculation of autocovariance functions R(i) = E(s(t)s(t+i))
     
-    %On multiplie f par Smat, matrice contenant à la colonne i
-    %l'échantillon f(t+i). Cela nous donne un vecteur des R(i) non
-    %normalisés
+    %Smat(i,j) = f(t+i+j) if t+i+j < tmax
+    %We get the unnormalized R(i) by multiplicating 
+     
 
     R = [];
     
@@ -60,10 +68,10 @@ for fen = 1: Nfenetre % Pour chaque fenetre
 
     Ri = transpose(f)*Smat; 
 
-    Ri = Ri./Nechantillon; % On trouve les Ri
+    Ri = Ri./Nechantillon; % R(i)
     
     
-    %Creation de la matrice R 
+    %Creation of R matrix
 
     R = zeros(N+1);
 
@@ -80,7 +88,8 @@ for fen = 1: Nfenetre % Pour chaque fenetre
     end
     
     
-    %Calcul des coefficients LPC à partir de la matrice R
+    %Calculation of LPC coefficients from R matrix
+    % 
 
 
 
@@ -91,7 +100,7 @@ for fen = 1: Nfenetre % Pour chaque fenetre
     lpci = lpci(2:end);
     
     
-    %Rajout du nouveau vecteur coefficient dans la matrice
+    %add the new lpc coefficents vector in lpc matrix
     
     lpc(:,fen) = lpci;
     
