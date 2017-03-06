@@ -10,7 +10,7 @@ lpcs = {}; ss = {}; classOuiNon = {}; classOuiNonEstimee = {};
 
 
  
-%Calcul des coefficients LPC sur le signal utile
+%Calculation of LPC coefficients of the interesting part of the signal
 
 
 for i = 1:length(flist)
@@ -19,8 +19,8 @@ for i = 1:length(flist)
 
     nomFichier{length(nomFichier) + 1} = n;
     
-    %Si le nom du fichier contient 'non', la classe est 'non' et
-    %pareil avec 'oui' 
+    %if the file name is 'oui' ('non'), then class is 'oui' ('non') 
+    % otherwise -> undefined
     
     if (contains(n, 'non'))
         
@@ -41,19 +41,19 @@ for i = 1:length(flist)
     
     s = s(:,1);
     
-    %Troncage du signal pour ne conserver que la partie utile
+    %Let's crop the signal to get only the useful part
     
     sUtile = rogner(s);
     
-    %Mise en mémoire du signal tronqué
+    %put this signal in  list
     
     ss{length(nomFichier)} = sUtile;
     
-    %Calcul des coefficients lpc sur le signal utile
+    %Calculation of LPC coefficients lpc on cropped signal 
     
     lpc = calcul_lpc(sUtile,Fe);
     
-    %ajout d'une colonne de coefficients lpc dans la matrice lpcs
+    %add LPC coefficients in lpcs matrix 
     
     lpcs{length(nomFichier)} = lpc;
     
@@ -61,7 +61,7 @@ for i = 1:length(flist)
     
 end
 
-%Calcul et mise en mémoire de la distance élastique entre chaque fichier 
+%Calculation and record of 'elastical distance' between each file
 
 distanceElast = zeros(length(lpcs));
 
@@ -76,13 +76,13 @@ for i = 1: length(lpcs)
         
     end
     
-    %Tri des distances
+    %sort
     
     [C I] = sort(distanceElast(i,:));
     
     indexTri(i,:) = I;
     
-    %Classification des signaux
+    %Classification of signals
     classPredite = 0; kElements = 5;
     
     for k = 2:kElements+1
@@ -99,7 +99,7 @@ for i = 1: length(lpcs)
         end
     end
         
-        %Mémorisation de la prédiction
+        %Memorisation of prediction
         
         if classPredite > 0
             
@@ -114,7 +114,7 @@ for i = 1: length(lpcs)
             end
         end
         
-        %Comparaison avec la vérité
+        %Comparison with truth
         
         if classOuiNonEstimee{end} == classOuiNon{i}
             
@@ -125,7 +125,7 @@ for i = 1: length(lpcs)
 end
 
 
-%affichage des signaux utiles (test de robustesse de la fonction rogner)
+% plot cropped signal (test of robustness of 'rogner' function )
 
 
 for l = 1:length(flist)
@@ -140,7 +140,7 @@ end
 
 figure;
 
-%Affichage des distances de chacun des fichiers à chacun des autres 
+% plot distances from files to each other
 
 for k = 1:length(flist)
     
